@@ -4,11 +4,12 @@ const { hash } = require("bcryptjs");
 
 const User = require("../models/user")
 
-router.post("./signup", async(req, res) =>{
+// corrected "./signup" the . is for relative path
+router.post("/signup", async(req, res) =>{
     try{
         const { email, password } = req.body;
         //1. check if user already exists
-        const user = await User.findOne({ email:email });
+        const user = await User.findOne({ email:email }); //isn't User a model, a model can check its documents?
         // if user exists
         if(user)
             return res.status(500).json({
