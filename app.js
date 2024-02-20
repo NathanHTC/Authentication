@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGO_URI, {
    useUnifiedTopology: true,
 })
 .then(() => {
-    console.log("MongoDB connection is estabilised!!");
+    console.log("MongoDB connection is estabilised on databse: ", mongoose.connections[0].name);
 })
 .catch(err => console.error("mongoDB connection error: ", err))
 
