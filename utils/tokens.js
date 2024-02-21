@@ -8,11 +8,19 @@ const createAccessToken = (id) => {
 }
 
 //signing the refresh token
-const refreshToken = (id) => {
+const createRefreshToken = (id) => {
     return jwt.sign({ id }, process.env.REFRESH_TOKEN_SECRET, {
         expiresIn: "90d",
     });
 };
+
+//create a email verify token for user to resend the password later
+const createEmailVerifyToken = (id) => {
+    return jwt.sign({ id }, process.env.EMAIL_VERIFY_SECRET), {
+        expiresIn: 15 * 60,
+    }
+}
+
 
 //sending back access token to client
 const sendAccessToken = (_req, res, accessToken) => {
@@ -30,9 +38,10 @@ const sendRefreshToken = (res, refreshToken) => {
     });
 }
 
+
 module.exports = {
     createAccessToken,
-    refreshToken,
+    createRefreshToken,
     sendAccessToken,
     sendRefreshToken
 };
