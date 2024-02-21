@@ -16,9 +16,9 @@ const createRefreshToken = (id) => {
 
 //create a email verify token for user to resend the password later
 const createEmailVerifyToken = (id) => {
-    return jwt.sign({ id }, process.env.EMAIL_VERIFY_SECRET), {
+    return jwt.sign({ id }, process.env.EMAIL_VERIFY_SECRET, {
         expiresIn: 15 * 60,
-    }
+    });
 }
 
 
@@ -42,6 +42,7 @@ const sendRefreshToken = (res, refreshToken) => {
 module.exports = {
     createAccessToken,
     createRefreshToken,
+    createEmailVerifyToken,
     sendAccessToken,
     sendRefreshToken
 };
