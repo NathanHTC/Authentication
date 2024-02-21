@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const { hash } = require("bcryptjs");
+const bcrypt = require("bcrypt")
 
 const User = require("../models/user")
 
@@ -38,6 +39,44 @@ router.post("/signup", async(req, res) =>{
         });
     }
 });
+
+router.post('/signin', async (req, res) => {
+    try{
+        const { email, password } = req.body;
+        const user = await User.findOne({ email: email })
+        
+        //if email provided is not found, ask user to sign up first
+        if(!user){
+            return res.status(400).json({
+                "type": "warning",
+                "message":"It seems you haven't signed up"
+            })
+        }
+        
+        console.log(user.password)
+        const isMatch = await bcrypt.compare(password, user.password);
+
+
+        //if the password user provided match the password in databse
+        if (isMatch){
+            //sign in success
+            res.status(200).json({
+                "type":"success",
+                "message":"Welcome! You are signed in!"
+            })
+            //jump to user dashboard
+
+        }
+
+
+    } catch(error) {
+        console.log("Error in sign up phase: ", error)
+        res.status(500).json({
+            "type":"warning",
+            "message":"Ops.. there is an error when signing in", error
+        })
+    }
+})
 
 // const user1 = new userSchema({})
 router.get('/', (req, res) =>{
