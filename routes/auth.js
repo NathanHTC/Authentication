@@ -60,20 +60,25 @@ router.post('/signin', async (req, res) => {
         //if the password user provided match the password in databse
         if (isMatch){
             //sign in success
-            res.status(200).json({
+            return res.status(200).json({
                 "type":"success",
                 "message":"Welcome! You are signed in!"
             })
             //jump to user dashboard
 
+        } else {
+            return res.status(400).json({
+                "type":"warning",
+                "message":"password or email is incorrect, please check it"
+            })
         }
 
 
     } catch(error) {
         console.log("Error in sign up phase: ", error)
-        res.status(500).json({
+        return res.status(500).json({
             "type":"warning",
-            "message":"Ops.. there is an error when signing in", error
+            "message":"Ops..there is an error when signing in", error
         })
     }
 })
