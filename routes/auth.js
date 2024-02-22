@@ -2,7 +2,13 @@ var express = require("express");
 var router = express.Router();
 const { hash } = require("bcryptjs");
 const bcrypt = require("bcrypt")
-
+const { 
+    createAccessToken,
+    createRefreshToken,
+    createEmailVerifyToken,
+    sendAccessToken,
+    sendRefreshToken,
+} = require('../utils/tokens') 
 const User = require("../models/user")
 
 // corrected "./signup" the . is for relative path
@@ -53,25 +59,29 @@ router.post('/signin', async (req, res) => {
             })
         }
         
-        console.log(user.password)
+        
         const isMatch = await bcrypt.compare(password, user.password);
 
 
-        //if the password user provided match the password in databse
-        if (isMatch){
-            //sign in success
-            return res.status(200).json({
-                "type":"success",
-                "message":"Welcome! You are signed in!"
-            })
-            //jump to user dashboard
-
-        } else {
-            return res.status(400).json({
+        //if the provided password is incorrect
+        if(!isMatch){
+            return res.status(400).json({ 
                 "type":"warning",
-                "message":"password or email is incorrect, please check it"
+                "message":"Provided password is incorrect"
             })
         }
+
+        //if we are here, that means user pasword is correct
+        //create access token and refresh token
+        const accessToken = createAccessToken(user._id);
+        const refreshToken = createRefreshToken(user._id);
+        //save the refresh token into database/this user document
+        user.refreshToken = refreshToken;
+        await user.save();
+
+        //send the tokens in response
+        sendAccessToken(req, res, accessToken);
+        sendRefreshToken(res, refreshToken);
 
 
     } catch(error) {
@@ -82,6 +92,8 @@ router.post('/signin', async (req, res) => {
         })
     }
 })
+
+
 
 // const user1 = new userSchema({})
 router.get('/', (req, res) =>{
