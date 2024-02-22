@@ -87,13 +87,21 @@ router.post('/signin', async (req, res) => {
     } catch(error) {
         console.log("Error in sign up phase: ", error)
         return res.status(500).json({
-            "type":"warning",
-            "message":"Ops..there is an error when signing in", error
+            type:"warning",
+            message:"Ops..there is an error when signing in", error
         })
     }
 })
 
-
+//create logout end point
+router.post("/logout", (_req, res) => {
+    //clear cookies
+    res.clearCookie("refreshToken");
+    return res.json({
+        message: "Logged out successfully",
+        type: "success",
+    });
+});
 
 // const user1 = new userSchema({})
 router.get('/', (req, res) =>{
