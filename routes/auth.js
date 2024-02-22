@@ -10,6 +10,7 @@ const {
     sendRefreshToken,
 } = require('../utils/tokens') 
 const User = require("../models/user")
+const jwt = require('jsonwebtoken')
 
 // corrected "./signup" the . is for relative path
 router.post("/signup", async(req, res) =>{
@@ -54,8 +55,8 @@ router.post('/signin', async (req, res) => {
         //if email provided is not found, ask user to sign up first
         if(!user){
             return res.status(400).json({
-                "type": "warning",
-                "message":"It seems you haven't signed up"
+                type: "warning",
+                message:"It seems you haven't signed up"
             })
         }
         
@@ -66,8 +67,8 @@ router.post('/signin', async (req, res) => {
         //if the provided password is incorrect
         if(!isMatch){
             return res.status(400).json({ 
-                "type":"warning",
-                "message":"Provided password is incorrect"
+                type:"warning",
+                message:"Provided password is incorrect"
             })
         }
 
@@ -81,7 +82,7 @@ router.post('/signin', async (req, res) => {
 
         //send the tokens in response
         sendAccessToken(req, res, accessToken);
-        sendRefreshToken(res, refreshToken);
+        sendRefreshToken(res, refreshToken);      
 
 
     } catch(error) {
@@ -108,5 +109,37 @@ router.get('/', (req, res) =>{
     res.send("hello from the auth router");
 });
 
+
+// generate new access token from refreshToken in req cookies
+//when old access token expires, this should run to keep user signed in
+router.post('/refresh_token', async (req, res) => {
+    try{
+        const { refreshtoken } = req.cookies;
+        //if req does not have a refreshToken, meaning user is logged out
+        if(!refreshToken){
+            res.status(400).json({
+                type: "error",
+                message: "cookie expired, try login again"
+            });
+        }
+        //we have a refresh token, lets verify it
+        let id;
+        try{
+            id = jwt.verify(refreshtoken, process.env.REFRESH_TOKEN_SECRET).id;
+        } catch(error){
+            return res.status(500).json({
+                message:"Invalid refresh token!",
+                type:"error",
+            });
+        }
+
+    } catch(error){
+        res.status(500).json({
+            type: "error",
+            message: "error refreshing access token!", error
+        })
+    }
+    
+})
 
 module.exports = router;
