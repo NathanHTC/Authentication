@@ -94,8 +94,8 @@ router.post('/signin', async (req, res) => {
         })
     }
 })
-//a protected middleware is added, if verified, res should 
-//contain a user doc
+//a protected middleware is added, if access token is verified, add a
+//user field containing user doc
 router.get('/protected', protected, async (req, res) => {
     try{
         // if user exists in the request, send the data
