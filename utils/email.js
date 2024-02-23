@@ -3,11 +3,11 @@ const nodemailer = require("nodemailer");
 //this endpoint will be included in an password reset email 
 //that was sent to user, when clicked, it will reset the password
 const createPasswordResetUrl = (id, token) => {
-    `${process.env.CLIENT_URL}/reset-password/${id}/${token}`;
+    return `${process.env.CLIENT_URL}/reset-password/${id}/${token}`;
 }
 
 let transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_HOST,
+    service:'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass:process.env.EMAIL_PASSWORD,

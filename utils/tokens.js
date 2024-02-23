@@ -43,9 +43,9 @@ const setRefreshToken = (res, refreshToken) => {
 }
 
 //payload in this token will contain 3 + 1 createdAt info
-const createPasswordResetToken = ({ id, email, password }) => {
+const createPasswordResetToken = ({ _id, email, password }) => {
     const secret = password;
-    return jwt.sign({ id, email }, secret, {
+    return jwt.sign({ id:_id, email }, secret, {
         expiresIn: 15 * 60,
     })
 }

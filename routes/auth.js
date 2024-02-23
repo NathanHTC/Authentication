@@ -187,7 +187,7 @@ router.post('/refresh_token', async (req, res) => {
                 message:"doc matches id in refresh token is not found in user model"
             });
         }
-        console.log(user.email)
+        //console.log('tokens refreshed for ' , user.email)
 
         //if we are here, that means user doc with provided id is found
         //last check, if refresh token matches record in doc
@@ -227,7 +227,7 @@ router.post('/refresh_token', async (req, res) => {
 router.post('/send-password-reset-email', async (req, res) => {
     try{
         const { email } = req.body
-
+        
         const user = await User.findOne({ email })
 
         if(!user){
@@ -236,17 +236,22 @@ router.post('/send-password-reset-email', async (req, res) => {
                 message:"User does not exist!"
             })
         }
+        
         //passing in all user info
-        const token = createPasswordResetToken({ ...user, createdAt: Date.now() })
-        //password reset url that for user to click and reset
-        const url = createPasswordResetUrl(user.id, token)
+        const token = createPasswordResetToken(user)
+       
+        const url = createPasswordResetUrl(user._id, token)
+        
         //create the password reset email using user and url 
         const mailOptions = passwordResetTemplate(user, url)
+
+        //console.log("mailOption:", mailOptions)
 
         //send the email
         transporter.sendMail(mailOptions, (err, info) => {
             if(err){
                 return res.status(500).json({
+                    type:"error",
                     message:"error sending the mail!"
                 })
             }
@@ -282,6 +287,7 @@ router.post("/reset-password/:id/:token", async (req, res) => {
 
         //make sure token is valid
         //recall that we signed verify token using user passwd
+        //this token is signed using the old password
         const isValid = jwt.verify(token, user.password)
         //if not valid
         if(!isValid){
