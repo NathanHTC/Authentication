@@ -82,8 +82,8 @@ router.post('/signin', async (req, res) => {
 
         //send the tokens in response
         sendAccessToken(req, res, accessToken);
-        sendRefreshToken(res, refreshToken);      
-
+        sendRefreshToken(res, refreshToken); 
+           
 
     } catch(error) {
         console.log("Error in sign up phase: ", error)
@@ -116,22 +116,66 @@ router.post('/refresh_token', async (req, res) => {
     try{
         const { refreshtoken } = req.cookies;
         //if req does not have a refreshToken, meaning user is logged out
-        if(!refreshToken){
-            res.status(400).json({
+        if(!refreshtoken){
+            return res.status(401).json({
                 type: "error",
                 message: "cookie expired, try login again"
             });
         }
-        //we have a refresh token, lets verify it
+        //we have a refresh token, next is to verify it 
         let id;
         try{
+            //verify will decode user's refreshtoken to its payload, in this case { id } obj
             id = jwt.verify(refreshtoken, process.env.REFRESH_TOKEN_SECRET).id;
         } catch(error){
-            return res.status(500).json({
+            return res.status(401).json({
                 message:"Invalid refresh token!",
                 type:"error",
             });
         }
+
+        //if the decoded json payload does not include an id prop
+        if(!id){
+            return res.status(401)._construct({
+                type: "error",
+                message: "id prop not found in refresh token"
+            })
+        };
+
+        //check if doc with this id really present in mongo user model
+        const user = await User.findById(id);
+        //user not exists
+        if(!user){
+            return res.status(401).json({
+                type:"error",
+                message:"doc matches id in refresh token is not found in user model"
+            });
+        }
+
+        //if we are here, that means user doc with provided id is found
+        //last check, if refresh token matches record in doc
+        if(refreshtoken != user.refreshToken){
+            return res.status(403).json({
+                type: "error",
+                message: "refreshtoken in cookie not match with our record"
+            });
+        }
+
+        //refresh token is valid, finally, let's create new tokens
+        const newAccessToken = createAccessToken(user._id);
+        const newRefreshToken = createRefreshToken(user._id);
+
+        //update refresh token in database
+        user.refreshToken = newRefreshToken;
+        //store refresh token in res cookie
+        sendRefreshToken(res, newRefreshToken)
+        //return res in a json object
+        return res.status(200).json({
+            type: "success",
+            message: "access and refresh token refreshed",
+            newAccessToken,
+        })
+
 
     } catch(error){
         res.status(500).json({

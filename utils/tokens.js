@@ -26,8 +26,8 @@ const createEmailVerifyToken = (id) => {
 const sendAccessToken = (_req, res, accessToken) => {
     res.json({
         accessToken,
-        "type":"success",
-        "message":"Welcome! You are signed in"
+        type:"success",
+        message:"Welcome! You are signed in"
     });
 };
 
