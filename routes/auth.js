@@ -18,7 +18,8 @@ const {
     createPasswordResetUrl,
     passwordResetTemplate,
     passwordResetConfirmationTemplate,
-} = require("../utils/email")
+} = require("../utils/email");
+const { validate } = require("../models/user");
 
 // corrected "./signup" the . is for relative path
 router.post("/signup", async(req, res) =>{
@@ -258,6 +259,64 @@ router.post('/send-password-reset-email', async (req, res) => {
             message: "Error sending Email",
             error,
         })
+    }
+})
+
+router.post("/reset-password/:id/:token", async (req, res) => {
+    try{
+        const { id, token } = req.params
+        //get new password from the request body
+        const { newPassword } = req.body
+        
+        const user = await User.findById({ id })
+
+        if(!user){
+            return res.status(500).json({
+                type:"error",
+                message:"user does not exist!"
+            })
+        }
+
+        //make sure token is valid
+        //recall that we signed verify token using user passwd
+        const isValid = jwt.verify(token, user.password)
+        //if not valid
+        if(!isValid){
+            return res.status(403).json({
+                type:"error",
+                message:"Invalid Token!"
+            })
+        }
+        //token valid, hash new password and save
+        user.password = await bcrypt.hash(newPassword, 10)
+        await user.save()
+
+        //create confirmation email using template
+        const emailOptions = passwordResetConfirmationTemplate(user)
+
+        //send the mail
+        transporter.sendMail(emailOptions, (err, info) => {
+            if(err){
+                return res.status(500).json({
+                    type:"error",
+                    message:"Error sending email",
+                    error
+                })
+                return res.status(500).json({
+                    type:"success",
+                    message:"Email sent!"
+                })
+            }
+
+        })
+
+
+
+
+
+
+    } catch(error){
+
     }
 })
 
