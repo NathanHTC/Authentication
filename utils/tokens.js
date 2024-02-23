@@ -38,6 +38,13 @@ const sendRefreshToken = (res, refreshToken) => {
     });
 }
 
+const createPasswordResetToken = ({ id, email, password }) => {
+    const secret = password;
+    return jwt.sign({ id, email }, secret, {
+        expiresIn: 15 * 60,
+    })
+}
+
 
 module.exports = {
     createAccessToken,
