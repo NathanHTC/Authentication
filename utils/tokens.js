@@ -23,6 +23,8 @@ const createEmailVerifyToken = (id) => {
 
 
 //sending back access token to client
+//this send response with json payload
+//should be called after cookie is set
 const sendAccessToken = (_req, res, accessToken) => {
     res.json({
         accessToken,
@@ -32,6 +34,8 @@ const sendAccessToken = (_req, res, accessToken) => {
 };
 
 //sending back refresh token to client
+//this does not send a response, only sets the cookie
+//should be called first
 const sendRefreshToken = (res, refreshToken) => {
     res.cookie("refreshToken", refreshToken, {
         httpOnly:true,

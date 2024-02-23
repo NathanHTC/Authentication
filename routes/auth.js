@@ -86,16 +86,17 @@ router.post('/signin', async (req, res) => {
         const accessToken = createAccessToken(user._id);
         const refreshToken = createRefreshToken(user._id);
         //save the refresh token into database/this user document
-        user.refreshToken = refreshToken;
+        user.refreshtoken = refreshToken;
         await user.save();
 
         //send the tokens in response
-        sendAccessToken(req, res, accessToken);
+        //this sequence is important
         sendRefreshToken(res, refreshToken); 
+        sendAccessToken(req, res, accessToken);
            
 
     } catch(error) {
-        console.log("Error in sign up phase: ", error)
+        console.log("Error in sign in phase: ", error)
         return res.status(500).json({
             type:"warning",
             message:"Ops..there is an error when signing in", error
