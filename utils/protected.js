@@ -27,7 +27,7 @@ const protected = async (req, res, next) => {
     } catch(error){
         return res.status(401).json({
             type:"error",
-            message:"Invalid token!"
+            message:"Error in verifying token!"
         })
     }
 
@@ -35,7 +35,7 @@ const protected = async (req, res, next) => {
     if(!id){
         return res.status(401).json({
             type:"error",
-            message:"Invalid token!"
+            message:"Invalid token id!"
         })
     }
 
