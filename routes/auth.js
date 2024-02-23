@@ -8,10 +8,17 @@ const {
     createEmailVerifyToken,
     sendAccessToken,
     sendRefreshToken,
+    createPasswordResetToken
 } = require('../utils/tokens') 
 const User = require("../models/user")
 const jwt = require('jsonwebtoken')
 const { protected } = require('../utils/protected')
+const {
+    transporter,
+    createPasswordResetUrl,
+    passwordResetTemplate,
+    passwordResetConfirmationTemplate,
+} = require("../utils/email")
 
 // corrected "./signup" the . is for relative path
 router.post("/signup", async(req, res) =>{
@@ -111,7 +118,7 @@ router.get('/protected', protected, async (req, res) => {
             message: "You are not logged in!",
             type: "error",
         });
-        
+
     } catch(error){
         res.status(500).json({
             type:"error",
@@ -211,6 +218,47 @@ router.post('/refresh_token', async (req, res) => {
         })
     }
     
+})
+
+router.post('/send-password-reset-email', async (req, res) => {
+    try{
+        const { email } = req.body
+
+        const user = await User.findOne({ email })
+
+        if(!user){
+            return res.status(500).json({
+                type: "error",
+                message:"User does not exist!"
+            })
+        }
+        //passing in all user info
+        const token = createPasswordResetToken({ ...user, createdAt: Date.now() })
+        //password reset url that for user to click and reset
+        const url = createPasswordResetUrl(user.id, token)
+        //create the password reset email using user and url 
+        const mailOptions = passwordResetTemplate(user, url)
+
+        //send the email
+        transporter.sendMail(mailOptions, (err, info) => {
+            if(err){
+                return res.status(500).json({
+                    message:"error sending the mail!"
+                })
+            }
+            return res.json({
+                type:"success",
+                message:"Password reset link has been sent to your email!"
+            })
+        })
+
+    } catch(error){
+        res.status(500).json({
+            type: "error",
+            message: "Error sending Email",
+            error,
+        })
+    }
 })
 
 module.exports = router;

@@ -38,6 +38,7 @@ const sendRefreshToken = (res, refreshToken) => {
     });
 }
 
+//payload in this token will contain 3 + 1 createdAt info
 const createPasswordResetToken = ({ id, email, password }) => {
     const secret = password;
     return jwt.sign({ id, email }, secret, {
@@ -51,5 +52,6 @@ module.exports = {
     createRefreshToken,
     createEmailVerifyToken,
     sendAccessToken,
-    sendRefreshToken
+    sendRefreshToken,
+    createPasswordResetToken,
 };

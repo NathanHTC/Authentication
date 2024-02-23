@@ -1,5 +1,7 @@
 const nodemailer = require("nodemailer");
 
+//this endpoint will be included in an password reset email 
+//that was sent to user, when clicked, it will reset the password
 const createPasswordResetUrl = (id, token) => {
     `${process.env.CLIENT_URL}/reset-password/${id}/${token}`;
 }
@@ -17,6 +19,7 @@ let transporter = nodemailer.createTransport({
 const passwordResetTemplate = (user, url) => {
     const { username, email } = user;
     return {
+        //** why user email from .env is used here ? */
         from: `Mail - <${process.env.EMAIL_USER}>`,
         to: email,
         subject: `Reset Password`,
