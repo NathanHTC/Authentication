@@ -52,6 +52,7 @@ const passwordResetConfirmationTemplate = (user) => {
     }
 }
 
+
 module.exports = { 
     transporter,
     createPasswordResetUrl,
