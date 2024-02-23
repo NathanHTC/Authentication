@@ -36,7 +36,7 @@ const sendAccessToken = (_req, res, accessToken) => {
 //sending back refresh token to client
 //this does not send a response, only sets the cookie
 //should be called first
-const sendRefreshToken = (res, refreshToken) => {
+const setRefreshToken = (res, refreshToken) => {
     res.cookie("refreshToken", refreshToken, {
         httpOnly:true,
     });
@@ -56,6 +56,6 @@ module.exports = {
     createRefreshToken,
     createEmailVerifyToken,
     sendAccessToken,
-    sendRefreshToken,
+    setRefreshToken,
     createPasswordResetToken,
 };

@@ -7,7 +7,7 @@ const {
     createRefreshToken,
     createEmailVerifyToken,
     sendAccessToken,
-    sendRefreshToken,
+    setRefreshToken,
     createPasswordResetToken
 } = require('../utils/tokens') 
 const User = require("../models/user")
@@ -91,7 +91,7 @@ router.post('/signin', async (req, res) => {
 
         //send the tokens in response
         //this sequence is important
-        sendRefreshToken(res, refreshToken); 
+        setRefreshToken(res, refreshToken); 
         sendAccessToken(req, res, accessToken);
            
 
@@ -204,7 +204,7 @@ router.post('/refresh_token', async (req, res) => {
         user.refreshToken = newRefreshToken;
         await user.save
         //store refresh token in res cookie
-        sendRefreshToken(res, newRefreshToken)
+        setRefreshToken(res, newRefreshToken)
         //return res in a json object
         return res.status(200).json({
             type: "success",
