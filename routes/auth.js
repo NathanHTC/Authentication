@@ -273,22 +273,30 @@ router.post('/send-password-reset-email', async (req, res) => {
 router.post("/reset-password/:id/:token", async (req, res) => {
     try{
         const { id, token } = req.params
+        console.log("token is",token)
         //get new password from the request body
         const { newPassword } = req.body
+        //console.log("new password loaded")
+        const user = await User.findById(id)
         
-        const user = await User.findById({ id })
-
         if(!user){
             return res.status(500).json({
                 type:"error",
                 message:"user does not exist!"
             })
         }
+        console.log("user is:", user.email)
 
         //make sure token is valid
         //recall that we signed verify token using user passwd
         //this token is signed using the old password
-        const isValid = jwt.verify(token, user.password)
+        try{
+            const isValid = jwt.verify(token, user.password)
+        } catch(err){
+            console.error(err)
+        }
+
+        console.log('isvalid', isValid)
         //if not valid
         if(!isValid){
             return res.status(403).json({
@@ -296,26 +304,27 @@ router.post("/reset-password/:id/:token", async (req, res) => {
                 message:"Invalid Token!"
             })
         }
+        console.log("valid token")
         //token valid, hash new password and save
         user.password = await bcrypt.hash(newPassword, 10)
         await user.save()
 
         //create confirmation email using template
         const emailOptions = passwordResetConfirmationTemplate(user)
-
+        //console.log("email op")
         //send the mail
         transporter.sendMail(emailOptions, (err, info) => {
-            if(err){
+            if(err)
                 return res.status(500).json({
                     type:"error",
                     message:"Error sending email",
-                    error
+                    err
                 })
-                return res.status(500).json({
-                    type:"success",
-                    message:"Email sent!"
-                })
-            }
+            return res.status(500).json({
+                type:"success",
+                message:"Email sent!"
+            })
+            
 
         })
 
