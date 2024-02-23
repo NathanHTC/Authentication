@@ -1,6 +1,9 @@
-// we will define a middleware function to verify user 
+//middlewares are called before req is processed 
+//we will define a middleware function to verify user 
 // via access token, added a user field to request
 //call the next() middleware
+// we could use this mdware later to load user doc into req
+//from there, to load user doc into res or process the doc
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const protected = async (req, res, next) => {

@@ -98,7 +98,8 @@ router.post('/signin', async (req, res) => {
 //user field containing user doc
 router.get('/protected', protected, async (req, res) => {
     try{
-        // if user exists in the request, send the data
+        // if user exists in the request, 
+        //meaning the protected middleware function runs smooth
         if(req.user)
             return res.json({
                 type:"success",
@@ -110,7 +111,7 @@ router.get('/protected', protected, async (req, res) => {
             message: "You are not logged in!",
             type: "error",
         });
-    
+        
     } catch(error){
         res.status(500).json({
             type:"error",
