@@ -8,8 +8,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const protected = async (req, res, next) => {
     //get the token from header
-    const authorization = req.authorization["authorization"];
-    //OR  req.headers['authorization'] to retrieve the access JWT ***
+    const authorization = req.headers["authorization"];
+    // req.headers['authorization'] to retrieve the access JWT ***
 
     //if we dont have a token return error
     if(!authorization)
@@ -49,7 +49,11 @@ const protected = async (req, res, next) => {
         })
     }
 
-    //if user exists, we'll add a new field "user" to the request
+    //if user exists, that means token is valid
+    //lets set user prop verify to true and save it
+    //we'll add a new field "user" to the request object
+    // user.verified = true
+    // await user.save()
     req.user = user;
 
     //call the next middleware
