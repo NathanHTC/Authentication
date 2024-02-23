@@ -1,6 +1,14 @@
 # Authentication
 This project consists of: 
- use Node.js, Express and MongoDB to create the API. 
- JSON Web Tokens will also be used to store user data. 
+
+ Node.js is used to create the server API. 
+ 
+ JSON Web Tokens are used in session management. 
+
+ Express routers and middlewares are used to process requests
+
+ MongoDB used to store and retrieve user data
+ 
  Users can create an account with their email address and then use their 
- password for authentication. You will also use Node.js to send the password reset email message.
+ 
+ password for authentication. use Node.js to send the password reset email message.
