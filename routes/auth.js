@@ -192,6 +192,7 @@ router.post('/refresh_token', async (req, res) => {
 
         //update refresh token in database
         user.refreshToken = newRefreshToken;
+        await user.save
         //store refresh token in res cookie
         sendRefreshToken(res, newRefreshToken)
         //return res in a json object
