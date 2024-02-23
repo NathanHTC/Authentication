@@ -11,6 +11,7 @@ const {
 } = require('../utils/tokens') 
 const User = require("../models/user")
 const jwt = require('jsonwebtoken')
+const { protected } = require('../utils/protected')
 
 // corrected "./signup" the . is for relative path
 router.post("/signup", async(req, res) =>{
@@ -90,6 +91,30 @@ router.post('/signin', async (req, res) => {
         return res.status(500).json({
             type:"warning",
             message:"Ops..there is an error when signing in", error
+        })
+    }
+})
+//a protected middleware is added, if verified, res should 
+//contain a user doc
+router.get('/protected', protected, async (req, res) => {
+    try{
+        // if user exists in the request, send the data
+        if(req.user)
+            return res.json({
+                type:"success",
+                mssage:"You are logged in!",
+                user: req.user,
+            })
+        // if user doesn't exists, return error
+        return res.status(500).json({
+            message: "You are not logged in!",
+            type: "error",
+        });
+    
+    } catch(error){
+        res.status(500).json({
+            type:"error",
+            message:"Error in getting protected route!",
         })
     }
 })

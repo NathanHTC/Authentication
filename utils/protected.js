@@ -1,5 +1,5 @@
 // we will define a middleware function to verify user 
-// via access token, added a user field to user
+// via access token, added a user field to request
 //call the next() middleware
 
 const jwt = require("jsonwebtoken");
